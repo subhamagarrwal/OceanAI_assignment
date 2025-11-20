@@ -1,0 +1,44 @@
+{
+  "endpoints": {
+    "POST /apply_coupon": {
+      "description": "Validates a discount coupon code.",
+      "request_body": {
+        "code": "string (e.g., 'SAVE15')"
+      },
+      "responses": {
+        "200": {
+          "valid": true,
+          "discount_percent": 15,
+          "message": "Discount Applied!"
+        },
+        "400": {
+          "valid": false,
+          "discount_percent": 0,
+          "message": "Invalid Code"
+        }
+      }
+    },
+    "POST /submit_order": {
+      "description": "Processes the final order submission.",
+      "request_body": {
+        "fullname": "string",
+        "email": "string",
+        "address": "string",
+        "cart_total": "float",
+        "payment_method": "string (card|paypal)",
+        "shipping_method": "string (standard|express)"
+      },
+      "responses": {
+        "200": {
+          "status": "success",
+          "message": "Payment Successful!"
+        },
+        "422": {
+          "status": "error",
+          "message": "Validation Failed",
+          "errors": ["string"]
+        }
+      }
+    }
+  }
+}

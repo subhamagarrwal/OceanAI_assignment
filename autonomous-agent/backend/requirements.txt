@@ -10,3 +10,5 @@ llama-index-embeddings-huggingface
 llama-index-vector-stores-postgres
 sentence-transformers
 beautifulsoup4
+streamlit
+pypdf

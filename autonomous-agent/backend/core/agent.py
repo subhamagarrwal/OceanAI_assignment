@@ -52,6 +52,24 @@ class AutonomousQAAgent:
             
         return summary
     
+    def save_test_plan(self, test_plan: dict) -> Path:
+        """Saves just the test plan JSON."""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        plan_file = self.output_dir / f"test_plan_{timestamp}.json"
+        with open(plan_file, "w") as f:
+            json.dump(test_plan, f, indent=2)
+        print(f"📄 Saved test plan: {plan_file}")
+        return plan_file
+
+    def save_code(self, tc_id: str, code: str) -> Path:
+        """Saves a single generated script."""
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        code_file = self.output_dir / f"test_{tc_id}_{timestamp}.py"
+        with open(code_file, "w") as f:
+            f.write(code)
+        print(f"📄 Saved script: {code_file}")
+        return code_file
+    
     def run(self, requirement: str, generate_all_tests=True):
         print("="*60)
         print("🚀 AUTONOMOUS QA AGENT - STARTING")
