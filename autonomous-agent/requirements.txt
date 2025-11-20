@@ -1,0 +1,12 @@
+groq
+python-dotenv
+sqlalchemy
+psycopg2-binary
+asyncpg
+pgvector
+llama-index-core
+llama-index-readers-file
+llama-index-embeddings-huggingface
+llama-index-vector-stores-postgres
+sentence-transformers
+beautifulsoup4

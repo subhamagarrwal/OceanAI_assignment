@@ -1,0 +1,88 @@
+{
+  "test_cases": [
+    {
+      "id": "TC001",
+      "title": "Valid Email and Password",
+      "steps": [
+        "Launch the IMDb website",
+        "Click on the Sign In button",
+        "Enter a valid email address",
+        "Enter a valid password",
+        "Click on the Sign In button"
+      ],
+      "expected_result": "The user is successfully logged in and redirected to their account dashboard"
+    },
+    {
+      "id": "TC002",
+      "title": "Invalid Email",
+      "steps": [
+        "Launch the IMDb website",
+        "Click on the Sign In button",
+        "Enter an invalid email address",
+        "Enter a valid password",
+        "Click on the Sign In button"
+      ],
+      "expected_result": "An error message is displayed indicating that the email address is not recognized"
+    },
+    {
+      "id": "TC003",
+      "title": "Invalid Password",
+      "steps": [
+        "Launch the IMDb website",
+        "Click on the Sign In button",
+        "Enter a valid email address",
+        "Enter an invalid password",
+        "Click on the Sign In button"
+      ],
+      "expected_result": "An error message is displayed indicating that the password is incorrect"
+    },
+    {
+      "id": "TC004",
+      "title": "Empty Email Field",
+      "steps": [
+        "Launch the IMDb website",
+        "Click on the Sign In button",
+        "Leave the email field empty",
+        "Enter a valid password",
+        "Click on the Sign In button"
+      ],
+      "expected_result": "An error message is displayed indicating that the email field is required"
+    },
+    {
+      "id": "TC005",
+      "title": "Empty Password Field",
+      "steps": [
+        "Launch the IMDb website",
+        "Click on the Sign In button",
+        "Enter a valid email address",
+        "Leave the password field empty",
+        "Click on the Sign In button"
+      ],
+      "expected_result": "An error message is displayed indicating that the password field is required"
+    },
+    {
+      "id": "TC006",
+      "title": "SQL Injection Attempt",
+      "steps": [
+        "Launch the IMDb website",
+        "Click on the Sign In button",
+        "Enter a valid email address",
+        "Enter a password containing SQL injection code",
+        "Click on the Sign In button"
+      ],
+      "expected_result": "The SQL injection attempt is blocked and an error message is displayed"
+    },
+    {
+      "id": "TC007",
+      "title": "Cross-Site Scripting (XSS) Attempt",
+      "steps": [
+        "Launch the IMDb website",
+        "Click on the Sign In button",
+        "Enter a valid email address",
+        "Enter a password containing XSS code",
+        "Click on the Sign In button"
+      ],
+      "expected_result": "The XSS attempt is blocked and an error message is displayed"
+    }
+  ]
+}
