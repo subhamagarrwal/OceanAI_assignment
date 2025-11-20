@@ -1,0 +1,34 @@
+import requests
+import json
+
+BASE_URL = "http://localhost:8000"
+
+class APIClient:
+    @staticmethod
+    def upload_files(files):
+        # files is a list of ('files', open_file_object) tuples
+        try:
+            response = requests.post(f"{BASE_URL}/upload", files=files)
+            return response.status_code == 200
+        except:
+            return False
+
+    @staticmethod
+    def generate_plan(requirement: str):
+        try:
+            response = requests.post(f"{BASE_URL}/plan", json={"requirement": requirement})
+            if response.status_code == 200:
+                return response.json()
+            return {"error": response.text}
+        except Exception as e:
+            return {"error": str(e)}
+
+    @staticmethod
+    def generate_code(test_case: dict):
+        try:
+            response = requests.post(f"{BASE_URL}/code", json={"test_case": test_case})
+            if response.status_code == 200:
+                return response.json().get("code", "")
+            return f"# Error: {response.text}"
+        except Exception as e:
+            return f"# Error: {str(e)}"

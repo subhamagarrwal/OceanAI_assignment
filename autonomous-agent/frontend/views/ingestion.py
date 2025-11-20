@@ -1,7 +1,6 @@
 import streamlit as st
-from pathlib import Path
-from utils.state import initialize_agent
-from rag.ingestion import ingest_documents
+from utils.api_client import APIClient
+import io
 
 def render_ingestion_view():
     """Renders the Phase 1: Knowledge Base Ingestion view."""
@@ -29,43 +28,28 @@ def render_ingestion_view():
                 st.error("Please upload documents or paste HTML content.")
             else:
                 with st.status("Building Knowledge Base...", expanded=True) as status:
-                    # 1. Initialize Agent
-                    st.write("Initializing Agent components...")
-                    if st.session_state.agent is None:
-                        st.session_state.agent = initialize_agent()
+                    st.write("Uploading and processing documents...")
                     
-                    agent = st.session_state.agent
-                    # Access embed_model from the initialized agent
-                    embed_model = agent.rag_engine.retriever.embed_model
+                    files_to_upload = []
                     
-                    # 2. Process Files
-                    temp_dir = Path("temp_uploads")
-                    temp_dir.mkdir(exist_ok=True)
-                    
-                    # Save uploaded files temporarily
+                    # Prepare uploaded files
                     if uploaded_files:
-                        st.write(f"Processing {len(uploaded_files)} documents...")
-                        for uploaded_file in uploaded_files:
-                            file_path = temp_dir / uploaded_file.name
-                            with open(file_path, "wb") as f:
-                                f.write(uploaded_file.getbuffer())
-                            
-                            # Ingest
-                            ingest_documents(str(file_path), embed_model)
-                            st.write(f"Ingested: {uploaded_file.name}")
-
-                    # Save HTML
-                    if html_content:
-                        st.write("Processing HTML content...")
-                        html_path = temp_dir / "checkout.html"
-                        with open(html_path, "w", encoding="utf-8") as f:
-                            f.write(html_content)
-                        
-                        ingest_documents(str(html_path), embed_model)
-                        st.write("Ingested: checkout.html")
+                        for f in uploaded_files:
+                            files_to_upload.append(('files', (f.name, f.getvalue(), f.type)))
                     
-                    status.update(label="Knowledge Base Built Successfully!", state="complete", expanded=False)
-                
-                st.success("Knowledge Base Ready!")
-                st.session_state.step = 2
-                st.rerun()
+                    # Prepare HTML content as a file
+                    if html_content:
+                        html_file = io.BytesIO(html_content.encode('utf-8'))
+                        files_to_upload.append(('files', ('checkout.html', html_file, 'text/html')))
+                    
+                    # Call API
+                    success = APIClient.upload_files(files_to_upload)
+                    
+                    if success:
+                        status.update(label="Knowledge Base Built Successfully!", state="complete", expanded=False)
+                        st.success("Knowledge Base Ready!")
+                        st.session_state.step = 2
+                        st.rerun()
+                    else:
+                        status.update(label="Failed to build Knowledge Base", state="error")
+                        st.error("Backend API connection failed. Make sure the backend is running.")

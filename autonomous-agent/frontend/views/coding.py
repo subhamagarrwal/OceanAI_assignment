@@ -1,4 +1,5 @@
 import streamlit as st
+from utils.api_client import APIClient
 
 def render_coding_view():
     """Renders the Phase 3: Selenium Script Generation view."""
@@ -25,16 +26,14 @@ def render_coding_view():
             
             if st.button("Generate Selenium Script", type="primary"):
                 with st.spinner(f"Writing Python code for {tc_id}..."):
-                    agent = st.session_state.agent
                     
                     # Check if we already generated it
                     if tc_id in st.session_state.generated_code:
                         code = st.session_state.generated_code[tc_id]
                     else:
-                        code = agent.generate_selenium_code(selected_tc)
+                        # Call API
+                        code = APIClient.generate_code(selected_tc)
                         st.session_state.generated_code[tc_id] = code
-                        # Save to disk
-                        agent.save_code(tc_id, code)
                     
                     st.success(f"Script generated for {tc_id}!")
             

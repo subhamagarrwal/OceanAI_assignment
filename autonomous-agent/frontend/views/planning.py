@@ -1,4 +1,5 @@
 import streamlit as st
+from utils.api_client import APIClient
 
 def render_planning_view():
     """Renders the Phase 2: Test Planning view."""
@@ -17,9 +18,8 @@ def render_planning_view():
                 st.warning("Please enter a requirement.")
             else:
                 with st.spinner("Analyzing Knowledge Base & Generating Scenarios..."):
-                    # Call the Agent
-                    agent = st.session_state.agent
-                    result = agent.generate_test_plan(user_query)
+                    # Call the API
+                    result = APIClient.generate_plan(user_query)
                     
                     if "error" in result:
                         st.error(f"Error generating plan: {result['error']}")
