@@ -1,29 +1,14 @@
 # Autonomous QA Agent
 
-## 🐳 Run with Docker (Recommended)
+## 💻 Run Locally
 
-1. **Prerequisites:** Ensure Docker and Docker Compose are installed and **Docker Desktop is running**.
+### Prerequisites
+The project requires API keys and Database credentials. I have provided a `.env.example` file with the necessary credentials for this assignment.
 
-2. **Environment Setup:**
-   The project requires API keys and Database credentials. I have provided a `.env.example` file with the necessary credentials for this assignment.
-   
-   ```bash
-   # Rename the example file to .env
-   cp .env.example .env
-   ```
-
-3. **Build and Run:**
-   ```bash
-   docker-compose up --build
-   ```
-
-4. **Access the App:**
-   - **Frontend:** [http://localhost:8501](http://localhost:8501)
-   - **Backend API Docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
-
----
-
-## 💻 Run Locally (Manual Setup)
+```bash
+# Rename the example file to .env in the root directory
+cp .env.example .env
+```
 
 ### Backend
 1. Navigate to the `backend` directory:
@@ -76,5 +61,27 @@ Provides the user interface for interacting with the agent.
 - **`utils/`**: Helper functions and the API client for communicating with the backend.
 
 ### Root Files
-- **`docker-compose.yml`**: Orchestrates the multi-container Docker application.
 - **`.env.example`**: Template for environment variables (API keys, DB credentials).
+
+## ☁️ Deployment on Render
+
+### Backend Deployment
+1. Create a new **Web Service** on Render.
+2. Connect your GitHub repository.
+3. **Settings:**
+   - **Root Directory:** `autonomous-agent/backend`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `uvicorn api:app --host 0.0.0.0 --port $PORT`
+4. **Environment Variables:**
+   - Add `GROQ_API_KEY`
+   - Add `CONNECTION_STRING`
+
+### Frontend Deployment
+1. Create a new **Web Service** on Render.
+2. Connect your GitHub repository.
+3. **Settings:**
+   - **Root Directory:** `autonomous-agent/frontend`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `streamlit run app.py --server.port $PORT --server.address 0.0.0.0`
+4. **Environment Variables:**
+   - Add `BACKEND_URL` (The URL of your deployed backend, e.g., `https://your-backend.onrender.com`)
