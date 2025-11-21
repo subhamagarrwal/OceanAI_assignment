@@ -1,9 +1,0 @@
-{
-  "requirement": "User login functionality with email and password",
-  "timestamp": "20251120_154946",
-  "test_count": 1,
-  "test_plan_file": "generated_tests\\test_plan_20251120_154946.json",
-  "code_files": [
-    "generated_tests\\test_TC001_20251120_154946.py"
-  ]
-}

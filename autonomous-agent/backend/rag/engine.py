@@ -12,22 +12,29 @@ class RAGQueryEngine:
         context = "\n\n".join([n.node.text for n in retrieved])
         
         final_prompt = f"""
-        You are a Test Scenario Generation LLM.
-        Based on the Context below, generate a detailed Test Plan in JSON.
+        You are a Senior QA Automation Architect.
+        Based on the Context below, generate a COMPREHENSIVE Test Plan in JSON.
         
-        CONTEXT:
+        ### CONTEXT
+        <documentation>
         {context}
+        </documentation>
 
-        QUESTION:
+        ### TASK
+        <question>
         {q}
+        </question>
 
-        OUTPUT REQUIREMENTS:
-        Return a JSON object with a key "test_cases" containing a list.
-        Each item must have:
-        - "id": "TC001"
-        - "title": "Short title"
-        - "steps": ["Step 1", "Step 2", ...]
-        - "expected_result": "Final verification step"
+        ### OUTPUT REQUIREMENTS
+        1. **Quantity**: Generate a minimum of 10 test cases.
+        2. **Coverage**: Include Positive, Negative, and Edge cases.
+        3. **Format**: Return a JSON object with a key "test_cases" containing a list.
+        4. **Structure**: Each item must have:
+           - "id": "TC001", "TC002", etc.
+           - "title": "Short descriptive title"
+           - "description": "Detailed description of what is being tested"
+           - "steps": ["Step 1", "Step 2", ...]
+           - "expected_result": "Final verification step"
         """
         
         return groq_smart(final_prompt)

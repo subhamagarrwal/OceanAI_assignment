@@ -22,7 +22,37 @@ class AutonomousQAAgent:
     
     def generate_selenium_code(self, test_case: dict) -> str:
         print(f"\n🤖 Step 2: Generating Selenium code for TC: {test_case.get('id', 'Unknown')}")
-        code = generate_selenium_script(json.dumps(test_case, indent=2))
+        
+        # 1. Retrieve HTML Content
+        html_content = ""
+        # Try assets folder first
+        assets_path = Path("assets/checkout.html")
+        # Try temp_uploads folder next (relative to backend execution)
+        temp_path = Path("temp_uploads/checkout.html")
+        # Try absolute path if needed (assuming workspace root)
+        workspace_assets = Path("../assets/checkout.html")
+
+        if assets_path.exists():
+            html_content = assets_path.read_text(encoding="utf-8")
+        elif temp_path.exists():
+            html_content = temp_path.read_text(encoding="utf-8")
+        elif workspace_assets.exists():
+            html_content = workspace_assets.read_text(encoding="utf-8")
+        else:
+            print("⚠️ Warning: checkout.html not found in assets or temp_uploads")
+            html_content = "<!-- HTML Content not found. Please assume standard checkout form elements. -->"
+
+        # 2. Retrieve RAG Context
+        # We query the RAG engine using the test case description or steps
+        query = f"How to automate: {test_case.get('description', '')} {test_case.get('steps', '')}"
+        rag_context = self.rag_engine.query(query)
+
+        # 3. Generate Code
+        code = generate_selenium_script(
+            json.dumps(test_case, indent=2),
+            html_content=html_content,
+            rag_context=rag_context
+        )
         return code
     
     def save_artifacts(self, test_plan: dict, codes: dict, requirement: str):
