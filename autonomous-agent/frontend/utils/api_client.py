@@ -1,5 +1,9 @@
 import requests
 import json
+import os
+# Get URL from env (Docker) or default to localhost (Local dev)
+BASE_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
+
 
 BASE_URL = "http://localhost:8000"
 

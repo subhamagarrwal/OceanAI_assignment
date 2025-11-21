@@ -6,3 +6,4 @@ venv/
 .vscode/
 .ipynb_checkpoints/
 autonomous-qa-agent/
+sample_example/
