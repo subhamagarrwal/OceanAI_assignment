@@ -1,9 +1,8 @@
 from llama_index.core import SimpleDirectoryReader
 from llama_index.core.node_parser import SentenceSplitter
-from rag.database import vector_store
 from sentence_transformers import SentenceTransformer
 
-def ingest_documents(file_path: str, embed_model: SentenceTransformer):
+def ingest_documents(file_path: str, embed_model: SentenceTransformer, vector_store):
     print(f"Loading documents from {file_path}...")
     
     try:

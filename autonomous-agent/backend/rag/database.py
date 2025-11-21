@@ -21,12 +21,13 @@ else:
     )
 
 # PGVectorStore - Use connection pooling parameters
-vector_store = PGVectorStore.from_params(
-    database=DB_NAME,
-    host=DB_HOST,
-    port=int(DB_PORT),
-    user=DB_USER,
-    password=DB_PASS,
-    table_name=VECTOR_TABLE,
-    embed_dim=EMBED_DIM,
-)
+def get_vector_store():
+    return PGVectorStore.from_params(
+        database=DB_NAME,
+        host=DB_HOST,
+        port=int(DB_PORT),
+        user=DB_USER,
+        password=DB_PASS,
+        table_name=VECTOR_TABLE,
+        embed_dim=EMBED_DIM,
+    )

@@ -7,7 +7,7 @@ from pathlib import Path
 
 # Import your existing modules
 from sentence_transformers import SentenceTransformer
-from rag.database import vector_store
+from rag.database import get_vector_store
 from rag.retriever import PGVectorRetriever
 from rag.engine import RAGQueryEngine
 from core.agent import AutonomousQAAgent
@@ -18,6 +18,21 @@ app = FastAPI(title="Autonomous QA Agent API")
 # --- Global State ---
 agent = None
 embed_model = None
+vector_store = None
+
+
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "Autonomous QA Agent Backend is running"}
+
+
+@app.get("/health")
+async def health():
+    return {
+        "status": "healthy",
+        "agent_initialized": agent is not None,
+        "vector_store_initialized": vector_store is not None
+    }
 
 class PlanRequest(BaseModel):
     requirement: str
@@ -27,13 +42,24 @@ class CodeRequest(BaseModel):
 
 @app.on_event("startup")
 async def startup_event():
-    global agent, embed_model
-    print("🚀 Initializing RAG & Agent...")
-    embed_model = SentenceTransformer("all-MiniLM-L6-v2")
-    retriever = PGVectorRetriever(vector_store, embed_model)
-    rag_engine = RAGQueryEngine(retriever)
-    agent = AutonomousQAAgent(rag_engine, output_dir="generated_tests")
-    print("✅ Backend Ready!")
+    global agent, embed_model, vector_store
+    try:
+        print("🚀 Initializing RAG & Agent...")
+        embed_model = SentenceTransformer("all-MiniLM-L6-v2")
+        print("✅ Embedding model loaded")
+        
+        vector_store = get_vector_store()
+        print("✅ Vector store initialized")
+        
+        retriever = PGVectorRetriever(vector_store, embed_model)
+        rag_engine = RAGQueryEngine(retriever)
+        agent = AutonomousQAAgent(rag_engine, output_dir="generated_tests")
+        print("✅ Backend Ready!")
+    except Exception as e:
+        print(f"❌ Startup error: {e}")
+        print("⚠️ Server will start but some features may be unavailable")
+        agent = None
+        vector_store = None
 
 @app.post("/upload")
 async def upload_files(files: List[UploadFile] = File(...)):
@@ -50,7 +76,7 @@ async def upload_files(files: List[UploadFile] = File(...)):
         
         # Ingest immediately
         try:
-            ingest_documents(str(file_path), embed_model)
+            ingest_documents(str(file_path), embed_model, vector_store)
         except Exception as e:
             print(f"Error ingesting {file.filename}: {e}")
             # We continue even if one fails, or you might want to return error
@@ -76,4 +102,5 @@ async def generate_code(request: CodeRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
