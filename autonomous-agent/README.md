@@ -63,26 +63,3 @@ Provides the user interface for interacting with the agent.
 ### Root Files
 - **`.env.example`**: Template for environment variables (API keys, DB credentials).
 
-## ☁️ Deployment on Render
-
-### Backend Deployment
-1. Create a new **Web Service** on Render.
-2. Connect your GitHub repository.
-3. **Settings:**
-   - **Root Directory:** `backend`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn api:app --host 0.0.0.0 --port $PORT`
-4. **Environment Variables:**
-   - Add `GROQ_API_KEY` with your Groq API key
-   - Add `CONNECTION_STRING` with your Supabase connection string
-   - `PORT` is automatically set by Render (default: 10000)
-
-### Frontend Deployment
-1. Create a new **Web Service** on Render.
-2. Connect your GitHub repository.
-3. **Settings:**
-   - **Root Directory:** `frontend`
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `streamlit run app.py --server.port $PORT --server.address 0.0.0.0`
-4. **Environment Variables:**
-   - Add `BACKEND_URL` with your deployed backend URL (e.g., `https://your-backend.onrender.com`)

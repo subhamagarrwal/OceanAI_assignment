@@ -10,12 +10,9 @@ llama-index-embeddings-huggingface
 llama-index-vector-stores-postgres
 sentence-transformers
 beautifulsoup4
-streamlit
 pypdf
 fastapi
 uvicorn
 python-multipart
 requests
-python-dotenv 
-psycopg2-binary
 sqlmodel
