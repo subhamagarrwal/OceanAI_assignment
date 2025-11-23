@@ -11,7 +11,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 MODEL_TC = "llama-3.3-70b-versatile"
 MODEL_CODE = "llama-3.3-70b-versatile"
 
-# Database - Use Supabase CONNECTION_STRING
+# Database 
 CONNECTION_STRING = os.getenv("CONNECTION_STRING")
 if CONNECTION_STRING:
     CONNECTION_STRING = CONNECTION_STRING.strip().strip('"').strip("'")

@@ -14,14 +14,14 @@ class AutonomousQAAgent:
         response_json = self.rag_engine.query(f"Generate test scenarios for: {requirement}")
         try:
             test_plan = json.loads(response_json)
-            print(f"✅ Generated {len(test_plan.get('test_cases', []))} test cases")
+            print(f"Succesfully Generated {len(test_plan.get('test_cases', []))} test cases")
             return test_plan
         except json.JSONDecodeError as e:
-            print(f"❌ JSON parsing error: {e}")
+            print(f"Sorry, JSON parsing error: {e}")
             return {"error": "Failed to parse test plan", "raw": response_json}
     
     def generate_selenium_code(self, test_case: dict) -> str:
-        print(f"\n🤖 Step 2: Generating Selenium code for TC: {test_case.get('id', 'Unknown')}")
+        print(f"\n Step 2: Generating Selenium code for TC: {test_case.get('id', 'Unknown')}")
         
         # 1. Retrieve HTML Content
         html_content = ""
@@ -56,7 +56,7 @@ class AutonomousQAAgent:
         return code
     
     def save_artifacts(self, test_plan: dict, codes: dict, requirement: str):
-        print("\n💾 Step 3: Saving artifacts...")
+        print("\n Step 3: Saving artifacts...")
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         
         plan_file = self.output_dir / f"test_plan_{timestamp}.json"
@@ -88,7 +88,7 @@ class AutonomousQAAgent:
         plan_file = self.output_dir / f"test_plan_{timestamp}.json"
         with open(plan_file, "w") as f:
             json.dump(test_plan, f, indent=2)
-        print(f"📄 Saved test plan: {plan_file}")
+        print(f"📄 Test plan: {plan_file}")
         return plan_file
 
     def save_code(self, tc_id: str, code: str) -> Path:
@@ -97,14 +97,12 @@ class AutonomousQAAgent:
         code_file = self.output_dir / f"test_{tc_id}_{timestamp}.py"
         with open(code_file, "w") as f:
             f.write(code)
-        print(f"📄 Saved script: {code_file}")
+        print(f"Saved script: {code_file}")
         return code_file
     
     def run(self, requirement: str, generate_all_tests=True):
-        print("="*60)
-        print("🚀 AUTONOMOUS QA AGENT - STARTING")
-        print("="*60)
-        print(f"📝 Requirement: {requirement}\n")
+        print("AUTONOMOUS QA AGENT start")
+        print(f"Requirement: {requirement}\n")
         
         test_plan = self.generate_test_plan(requirement)
         if "error" in test_plan:
@@ -121,11 +119,10 @@ class AutonomousQAAgent:
                 code = self.generate_selenium_code(tc)
                 codes[tc_id] = code
             except Exception as e:
-                print(f"❌ Failed to generate code for {tc_id}: {e}")
+                print(f"Error.Failed to generate code for {tc_id}: {e}")
                 codes[tc_id] = f"# ERROR: {e}"
         
         summary = self.save_artifacts(test_plan, codes, requirement)
-        print("\n" + "="*60)
-        print("✅ AUTONOMOUS QA AGENT - COMPLETED")
+        print("AUTONOMOUS QA AGENT - COMPLETED")
         print("="*60)
         return {"test_plan": test_plan, "codes": codes, "summary": summary}

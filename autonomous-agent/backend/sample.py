@@ -8,14 +8,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 async def test_connection():
-    # 1. Get the URL
+    # Get the URL
     database_url = os.getenv("CONNECTION_STRING")
     
     if not database_url:
-        print("❌ Error: DATABASE_URL not found in .env file.")
+        print(" Error: DATABASE_URL not found in .env file.")
         return
 
-    # 2. Fix the protocol for SQLAlchemy + Asyncpg
+    # 2. Fix for SQLAlchemy + Asyncpg
     # Supabase copies "postgres://" by default, but SQLAlchemy needs "postgresql+asyncpg://"
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql+asyncpg://", 1)
@@ -36,21 +36,15 @@ async def test_connection():
             version = result.scalar()
             
             print("\n✅ CONNECTION SUCCESSFUL!")
-            print("------------------------------------------------")
+
             print(f"Database Version: {version}")
-            print("------------------------------------------------")
+        
             
         await engine.dispose()
 
     except Exception as e:
         print("\n❌ CONNECTION FAILED")
-        print("------------------------------------------------")
         print(f"Error: {e}")
-        print("------------------------------------------------")
-        print("Troubleshooting tips:")
-        print("1. Check if your IP is allowed in Supabase (Network Restrictions).")
-        print("2. Verify the password is correct (special characters must be URL encoded).")
-        print("3. Ensure you are using port 5432 (Direct) or 6543 (Pooler).")
 
 if __name__ == "__main__":
     asyncio.run(test_connection())

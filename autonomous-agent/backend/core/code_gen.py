@@ -85,7 +85,7 @@ if __name__ == "__main__":
 """
 
     for attempt in range(max_retries):
-        print(f"\\n🔄 Attempt {attempt + 1}/{max_retries}")
+        print(f"\\n Attempt {attempt + 1}/{max_retries}")
         
         response = client.chat.completions.create(
             model=MODEL_CODE,
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         
         # Check if response is JSON instead of code
         if is_json_response(clean_content):
-            print("❌ LLM returned JSON instead of code. Retrying with stricter prompt...")
+            print(" LLM returned JSON instead of code. Retrying with stricter prompt...")
             prompt_base = f"""
 CRITICAL ERROR: You returned JSON. I need PYTHON CODE.
 
@@ -144,5 +144,5 @@ Please fix the code for this test case:
 Return ONLY the fixed Python code.
 """
     
-    print("⚠️ Max retries reached.")
+    print("Max retries reached.Try a better prompt or check test details.")
     return clean_content

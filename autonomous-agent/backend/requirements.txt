@@ -1,18 +1,20 @@
+# LLM & API
 groq
 python-dotenv
-sqlalchemy
-psycopg2-binary
-asyncpg
-pgvector
-llama-index-core
-llama-index-readers-file
-llama-index-embeddings-huggingface
-llama-index-vector-stores-postgres
-sentence-transformers
+
+# Vector Database (Thin client - NO embeddings, NO torch)
+chromadb-client
+
+# Document Processing
 beautifulsoup4
 pypdf
+
+# Web Framework
 fastapi
 uvicorn
 python-multipart
 requests
+
+# Data Models
+pydantic
 sqlmodel

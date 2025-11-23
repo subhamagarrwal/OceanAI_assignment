@@ -11,7 +11,7 @@ from config.settings import (
     EMBED_DIM
 )
 
-# SQLAlchemy engine - Use CONNECTION_STRING if available
+# SQLAlchemy engine - Use CONNECTION_STRING from env
 if CONNECTION_STRING:
     engine = create_engine(CONNECTION_STRING, pool_pre_ping=True, pool_size=5, max_overflow=10)
 else:
@@ -20,7 +20,7 @@ else:
         pool_pre_ping=True
     )
 
-# PGVectorStore - Use connection pooling parameters
+# PGVectorStore - Use connection pooling parameters- as we are using transaction pooling in Supabase
 def get_vector_store():
     return PGVectorStore.from_params(
         database=DB_NAME,
