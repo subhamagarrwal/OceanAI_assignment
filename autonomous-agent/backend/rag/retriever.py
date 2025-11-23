@@ -1,21 +1,26 @@
-from llama_index.core.retrievers import BaseRetriever
-from llama_index.core.vector_stores import VectorStoreQuery
-from llama_index.core import QueryBundle
-from llama_index.core.schema import NodeWithScore
-
-class PGVectorRetriever(BaseRetriever):
-    def __init__(self, vector_store, embed_model, k=3):
-        super().__init__()
-        self.vector_store = vector_store
+class ChromaRetriever:
+    def __init__(self, collection, embed_model, k=3):
+        self.collection = collection
         self.embed_model = embed_model
         self.k = k
 
-    def _retrieve(self, query_bundle: QueryBundle):
+    def retrieve(self, query_bundle):
+        from llama_index.core.schema import NodeWithScore, TextNode
+        
         q_emb = self.embed_model.encode(query_bundle.query_str).tolist()
-        q = VectorStoreQuery(query_embedding=q_emb, similarity_top_k=self.k)
-        result = self.vector_store.query(q)
-
+        
+        results = self.collection.query(
+            query_embeddings=[q_emb],
+            n_results=self.k
+        )
+        
         out = []
-        for node, score in zip(result.nodes, result.similarities):
-            out.append(NodeWithScore(node=node, score=score))
+        if results and results["documents"] and len(results["documents"]) > 0:
+            for i, doc_text in enumerate(results["documents"][0]):
+                distance = results["distances"][0][i] if results["distances"] else 0
+                similarity = 1 - distance
+                
+                node = TextNode(text=doc_text)
+                out.append(NodeWithScore(node=node, score=similarity))
+        
         return out

@@ -1,20 +1,12 @@
-# LLM & API
 groq
 python-dotenv
-
-# Vector Database (Thin client - NO embeddings, NO torch)
-chromadb-client
-
-# Document Processing
+chromadb
+llama-index-core
+llama-index-readers-file
+sentence-transformers
 beautifulsoup4
 pypdf
-
-# Web Framework
 fastapi
 uvicorn
 python-multipart
 requests
-
-# Data Models
-pydantic
-sqlmodel

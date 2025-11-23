@@ -5,21 +5,20 @@ import shutil
 import os
 from pathlib import Path
 
-# RAG imports
-from rag.ingestion import ingest_documents
-from rag.engine import RAGQueryEngine
-from rag.retriever import PGVectorRetriever
-from rag.database import get_vector_store
-from core.agent import AutonomousQAAgent
+# Import modules
 from sentence_transformers import SentenceTransformer
+from rag.database import get_vector_store
+from rag.retriever import ChromaRetriever
+from rag.engine import RAGQueryEngine
+from core.agent import AutonomousQAAgent
+from rag.ingestion import ingest_documents
 
 app = FastAPI(title="Autonomous QA Agent API")
 
-# global variables 
+# --- Global State ---
 agent = None
-rag_engine = None
 embed_model = None
-vector_store = None
+collection = None
 
 
 @app.get("/")
@@ -32,7 +31,7 @@ async def health():
     return {
         "status": "healthy",
         "agent_initialized": agent is not None,
-        "rag_engine_initialized": rag_engine is not None
+        "vector_store_initialized": collection is not None
     }
 
 
@@ -46,80 +45,57 @@ class CodeRequest(BaseModel):
 
 @app.on_event("startup")
 async def startup_event():
-    global agent, rag_engine, embed_model, vector_store
+    global agent, embed_model, collection
     try:
-        print("1.Initializing RAG Engine...")
+        print("🚀 Initializing RAG & Agent with ChromaDB...")
         
-        # Initialize embedding model
-        print("Loading embedding model...")
-        embed_model = SentenceTransformer('all-MiniLM-L6-v2')
-        print("2.Embedding model loaded")
+        embed_model = SentenceTransformer("all-MiniLM-L6-v2")
+        print("✅ Embedding model loaded")
         
-        # Initialize vector store
-        print("Connecting to vector store...")
-        vector_store = get_vector_store()
-        print("3.Vector store connected")
+        collection = get_vector_store()
+        print("✅ ChromaDB collection initialized")
         
-        # Initialize retriever
-        print("Initializing retriever...")
-        retriever = PGVectorRetriever(vector_store, embed_model, k=5)
-        print("4.Retriever initialized")
-        
-        # Initialize RAG engine
-        print("Initializing RAG engine...")
+        retriever = ChromaRetriever(collection, embed_model)
         rag_engine = RAGQueryEngine(retriever)
-        print("5.RAG Engine ready")
         
-        # Initialize Agent
-        print("Initializing QA Agent...")
         agent = AutonomousQAAgent(rag_engine, output_dir="generated_tests")
-        print("6.Autonomous QA Agent Ready!")
+        print("✅ Backend Ready!")
     except Exception as e:
+        print(f"❌ Startup error: {e}")
         import traceback
-        print(f"Error:Startup error: {e}")
-        print(f"❌ Traceback:\n{traceback.format_exc()}")
+        traceback.print_exc()
         print("⚠️ Server will start but some features may be unavailable")
         agent = None
-        rag_engine = None
-        embed_model = None
-        vector_store = None
+        collection = None
 
 
 @app.post("/upload")
 async def upload_files(files: List[UploadFile] = File(...)):
-    """
-    Upload and ingest documents into PGVector database.
-    """
-    if not embed_model or not vector_store:
-        raise HTTPException(
-            status_code=503,
-            detail="RAG system not initialized"
-        )
+    if not collection:
+        raise HTTPException(status_code=503, detail="Vector store not initialized")
+    
+    if not embed_model:
+        raise HTTPException(status_code=503, detail="Embedding model not initialized")
     
     temp_dir = Path("temp_uploads")
     temp_dir.mkdir(exist_ok=True)
     
-    file_paths = []
+    ingested_count = 0
     for file in files:
         file_path = temp_dir / file.filename
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        file_paths.append(str(file_path))
+        try:
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            
+            ingest_documents(str(file_path), embed_model, collection)
+            ingested_count += 1
+        except Exception as e:
+            print(f"Error processing {file.filename}: {e}")
     
-    # Ingest into PGVector
-    try:
-        for file_path in file_paths:
-            ingest_documents(file_path, embed_model, vector_store)
-        
-        return {
-            "message": f"Successfully processed {len(files)} files",
-            "files": [f.filename for f in files]
-        }
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Ingestion failed: {str(e)}"
-        )
+    return {
+        "message": f"Successfully processed {ingested_count} out of {len(files)} files",
+        "total_documents_in_store": collection.count()
+    }
 
 
 @app.post("/plan")
@@ -138,6 +114,7 @@ async def generate_code(request: CodeRequest):
     
     code = agent.generate_selenium_code(request.test_case)
     return {"code": code}
+
 
 if __name__ == "__main__":
     import uvicorn
