@@ -38,7 +38,6 @@ async def test_connection():
             print("\n✅ CONNECTION SUCCESSFUL!")
 
             print(f"Database Version: {version}")
-        
             
         await engine.dispose()
 

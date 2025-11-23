@@ -10,7 +10,7 @@ class AutonomousQAAgent:
         self.output_dir.mkdir(exist_ok=True)
         
     def generate_test_plan(self, requirement: str) -> dict:
-        print("\n🔍 Step 1: Generating Test Plan...")
+        print("\nStep 1: Generating Test Plan...")
         response_json = self.rag_engine.query(f"Generate test scenarios for: {requirement}")
         try:
             test_plan = json.loads(response_json)
