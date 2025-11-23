@@ -11,7 +11,7 @@ from config.settings import (
     EMBED_DIM
 )
 
-# SQLAlchemy engine - Use CONNECTION_STRING from env
+# SQLAlchemy engine 
 if CONNECTION_STRING:
     engine = create_engine(CONNECTION_STRING, pool_pre_ping=True, pool_size=5, max_overflow=10)
 else:

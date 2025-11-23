@@ -69,6 +69,4 @@ Provides the user interface for interacting with the agent.
 
 ## Deployment 
 
-Users can deploy the frontend and backend locally after filling in the relevant details for the .env file. For production deployment, users can consider using platforms like Docker, AWS, or Heroku to host the backend and frontend services.
-
-This project couldnt be deployed on Docker Hub due to the large size of the Groq model files and the need for heavy GPU-libraries as we are using all-MiniLM-L6-v2, which requires us to have sentence-transformers package which requires transitive dependencies like PyTorch and CUDA.
+Users can deploy the frontend and backend locally after filling in the relevant details for the .env file. For production deployment, users can consider using platforms like AWS or Heroku to host the backend and frontend services.
