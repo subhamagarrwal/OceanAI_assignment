@@ -6,5 +6,5 @@ venv/
 .vscode/
 .ipynb_checkpoints/
 autonomous-qa-agent/
-sample_example/autonomous-agent/OPTIMIZATION_SUMMARY.md
+autonomous-agent/OPTIMIZATION_SUMMARY.md
 explaination/
