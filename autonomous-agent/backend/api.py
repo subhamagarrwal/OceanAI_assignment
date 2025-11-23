@@ -5,20 +5,19 @@ import shutil
 import os
 from pathlib import Path
 
-# Import modules
-from sentence_transformers import SentenceTransformer
-from rag.database import get_vector_store
-from rag.retriever import ChromaRetriever
-from rag.engine import RAGQueryEngine
-from core.agent import AutonomousQAAgent
+# RAG imports
 from rag.ingestion import ingest_documents
+from rag.engine import RAGQueryEngine
+from rag.retriever import ChromaRetriever
+from rag.database import get_vector_store
+from core.agent import AutonomousQAAgent
 
 app = FastAPI(title="Autonomous QA Agent API")
 
-# --- Global State ---
+# global variables 
 agent = None
-embed_model = None
-collection = None
+rag_engine = None
+vector_store = None
 
 
 @app.get("/")
@@ -31,7 +30,8 @@ async def health():
     return {
         "status": "healthy",
         "agent_initialized": agent is not None,
-        "vector_store_initialized": collection is not None
+        "rag_engine_initialized": rag_engine is not None,
+        "vector_store_initialized": vector_store is not None
     }
 
 
@@ -45,57 +45,74 @@ class CodeRequest(BaseModel):
 
 @app.on_event("startup")
 async def startup_event():
-    global agent, embed_model, collection
+    global agent, rag_engine, vector_store
     try:
-        print("🚀 Initializing RAG & Agent with ChromaDB...")
+        print("1.Initializing RAG Engine...")
         
-        embed_model = SentenceTransformer("all-MiniLM-L6-v2")
-        print("✅ Embedding model loaded")
+        # Initialize vector store (ChromaDB with built-in embeddings)
+        print("Connecting to vector store...")
+        vector_store = get_vector_store()
+        print("2.Vector store connected")
         
-        collection = get_vector_store()
-        print("✅ ChromaDB collection initialized")
+        # Initialize retriever (no external embedding model needed)
+        print("Initializing retriever...")
+        retriever = ChromaRetriever(vector_store, k=5)
+        print("3.Retriever initialized")
         
-        retriever = ChromaRetriever(collection, embed_model)
+        # Initialize RAG engine
+        print("Initializing RAG engine...")
         rag_engine = RAGQueryEngine(retriever)
+        print("4.RAG Engine ready")
         
+        # Initialize Agent
+        print("Initializing QA Agent...")
         agent = AutonomousQAAgent(rag_engine, output_dir="generated_tests")
-        print("✅ Backend Ready!")
+        print("5.Autonomous QA Agent Ready!")
     except Exception as e:
-        print(f"❌ Startup error: {e}")
         import traceback
-        traceback.print_exc()
+        print(f"Error: Startup error: {e}")
+        print(f"❌ Traceback:\n{traceback.format_exc()}")
         print("⚠️ Server will start but some features may be unavailable")
         agent = None
-        collection = None
+        rag_engine = None
+        vector_store = None
 
 
 @app.post("/upload")
 async def upload_files(files: List[UploadFile] = File(...)):
-    if not collection:
-        raise HTTPException(status_code=503, detail="Vector store not initialized")
-    
-    if not embed_model:
-        raise HTTPException(status_code=503, detail="Embedding model not initialized")
+    """
+    Upload and ingest documents into ChromaDB database.
+    """
+    if not vector_store:
+        raise HTTPException(
+            status_code=503,
+            detail="RAG system not initialized"
+        )
     
     temp_dir = Path("temp_uploads")
     temp_dir.mkdir(exist_ok=True)
     
-    ingested_count = 0
+    file_paths = []
     for file in files:
         file_path = temp_dir / file.filename
-        try:
-            with open(file_path, "wb") as buffer:
-                shutil.copyfileobj(file.file, buffer)
-            
-            ingest_documents(str(file_path), embed_model, collection)
-            ingested_count += 1
-        except Exception as e:
-            print(f"Error processing {file.filename}: {e}")
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        file_paths.append(str(file_path))
     
-    return {
-        "message": f"Successfully processed {ingested_count} out of {len(files)} files",
-        "total_documents_in_store": collection.count()
-    }
+    # Ingest into ChromaDB
+    try:
+        for file_path in file_paths:
+            ingest_documents(file_path, vector_store)
+        
+        return {
+            "message": f"Successfully processed {len(files)} files",
+            "files": [f.filename for f in files]
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ingestion failed: {str(e)}"
+        )
 
 
 @app.post("/plan")
@@ -114,7 +131,6 @@ async def generate_code(request: CodeRequest):
     
     code = agent.generate_selenium_code(request.test_case)
     return {"code": code}
-
 
 if __name__ == "__main__":
     import uvicorn

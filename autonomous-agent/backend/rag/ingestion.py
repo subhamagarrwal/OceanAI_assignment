@@ -1,9 +1,12 @@
 from llama_index.core import SimpleDirectoryReader
 from llama_index.core.node_parser import SentenceSplitter
-from sentence_transformers import SentenceTransformer
 import uuid
 
-def ingest_documents(file_path: str, embed_model: SentenceTransformer, collection):
+def ingest_documents(file_path: str, collection):
+    """
+    Ingest documents into ChromaDB collection.
+    ChromaDB will handle embedding generation automatically.
+    """
     print(f"Loading documents from {file_path}...")
     
     try:
@@ -21,9 +24,8 @@ def ingest_documents(file_path: str, embed_model: SentenceTransformer, collectio
 
     print(f"Total chunks: {len(nodes)}")
 
-    print("Generating embeddings and adding to ChromaDB...")
+    print("Processing documents and adding to ChromaDB...")
     valid_docs = []
-    valid_embeddings = []
     valid_ids = []
     
     for node in nodes:
@@ -33,17 +35,14 @@ def ingest_documents(file_path: str, embed_model: SentenceTransformer, collectio
         if len(cleaned_text) < 5:
             continue
         
-        embedding = embed_model.encode(cleaned_text).tolist()
-        
         valid_docs.append(cleaned_text)
-        valid_embeddings.append(embedding)
         valid_ids.append(str(uuid.uuid4()))
 
     if valid_docs:
         print(f"Adding {len(valid_docs)} documents to ChromaDB...")
+        # ChromaDB will generate embeddings automatically
         collection.add(
             documents=valid_docs,
-            embeddings=valid_embeddings,
             ids=valid_ids
         )
         print(f"✅ Successfully added {len(valid_docs)} documents to ChromaDB.")
