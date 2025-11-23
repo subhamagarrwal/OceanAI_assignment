@@ -45,7 +45,7 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./autonomous-agent/backend:/app
+      - ./backend:/app
       - /app/__pycache__
     networks:
       - oceanai_network
@@ -67,7 +67,7 @@ services:
     depends_on:
       - backend
     volumes:
-      - ./autonomous-agent/frontend:/app
+      - ./frontend:/app
       - /app/__pycache__
     networks:
       - oceanai_network

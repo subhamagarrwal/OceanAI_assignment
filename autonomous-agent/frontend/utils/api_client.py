@@ -1,11 +1,15 @@
 import requests
 import json
 import os
-# Get URL from env (Docker) or default to localhost (Local dev)
-BASE_URL = os.getenv("BACKEND_URL", "http://localhost:8000")
 
-
-BASE_URL = "http://localhost:8000"
+# Detect if running in Docker by checking for Docker hostname
+# In Docker, we use the service name as hostname; locally we use localhost
+def get_backend_url():
+    if "BACKEND_API_URL" in os.environ:
+        return os.getenv("BACKEND_API_URL")
+    return "http://localhost:8000"
+    
+BASE_URL = get_backend_url()
 
 class APIClient:
     @staticmethod
