@@ -15,7 +15,7 @@ from sentence_transformers import SentenceTransformer
 
 app = FastAPI(title="Autonomous QA Agent API")
 
-# --- Global State ---
+# global variables 
 agent = None
 rag_engine = None
 embed_model = None
@@ -48,35 +48,35 @@ class CodeRequest(BaseModel):
 async def startup_event():
     global agent, rag_engine, embed_model, vector_store
     try:
-        print("🚀 Initializing RAG Engine...")
+        print("1.Initializing RAG Engine...")
         
         # Initialize embedding model
         print("Loading embedding model...")
         embed_model = SentenceTransformer('all-MiniLM-L6-v2')
-        print("✅ Embedding model loaded")
+        print("2.Embedding model loaded")
         
         # Initialize vector store
         print("Connecting to vector store...")
         vector_store = get_vector_store()
-        print("✅ Vector store connected")
+        print("3.Vector store connected")
         
         # Initialize retriever
         print("Initializing retriever...")
         retriever = PGVectorRetriever(vector_store, embed_model, k=5)
-        print("✅ Retriever initialized")
+        print("4.Retriever initialized")
         
         # Initialize RAG engine
         print("Initializing RAG engine...")
         rag_engine = RAGQueryEngine(retriever)
-        print("✅ RAG Engine ready")
+        print("5.RAG Engine ready")
         
         # Initialize Agent
         print("Initializing QA Agent...")
         agent = AutonomousQAAgent(rag_engine, output_dir="generated_tests")
-        print("✅ Autonomous QA Agent Ready!")
+        print("6.Autonomous QA Agent Ready!")
     except Exception as e:
         import traceback
-        print(f"❌ Startup error: {e}")
+        print(f"Error:Startup error: {e}")
         print(f"❌ Traceback:\n{traceback.format_exc()}")
         print("⚠️ Server will start but some features may be unavailable")
         agent = None

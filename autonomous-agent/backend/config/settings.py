@@ -30,7 +30,7 @@ if CONNECTION_STRING:
     print(f"  User: {DB_USER}")
     print(f"  Password: {'*' * len(DB_PASS) if DB_PASS else 'None'}")
 else:
-    # Fallback to individual env vars
+    # Fallback to generic env variables
     DB_USER = os.getenv("PG_USER", "myuser")
     DB_PASS = os.getenv("PG_PASS", "password")
     DB_NAME = os.getenv("PG_DB", "rag_db")
