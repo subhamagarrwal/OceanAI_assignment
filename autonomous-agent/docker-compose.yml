@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: oceanai_postgres
+    environment:
+      POSTGRES_USER: ${PG_USER:-myuser}
+      POSTGRES_PASSWORD: ${PG_PASS:-password}
+      POSTGRES_DB: ${PG_DB:-rag_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-myuser}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - oceanai_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: oceanai_backend
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      
+      CONNECTION_STRING: ${CONNECTION_STRING:-postgresql://${PG_USER:-myuser}:${PG_PASS:-password}@db:5432/${PG_DB:-rag_db}}
+      PG_USER: ${PG_USER:-myuser}
+      PG_PASS: ${PG_PASS:-password}
+      PG_DB: ${PG_DB:-rag_db}
+      PG_HOST: db
+      PG_PORT: 5432
+      
+      VECTOR_TABLE: ${VECTOR_TABLE:-rag_nodes}
+      
+      PORT: 8000
+      BACKEND_HOST: 0.0.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./autonomous-agent/backend:/app
+      - /app/__pycache__
+    networks:
+      - oceanai_network
+    # restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: oceanai_frontend
+    ports:
+      - "${STREAMLIT_SERVER_PORT:-8501}:8501"
+    environment:
+      STREAMLIT_SERVER_HEADLESS: "true"
+      STREAMLIT_SERVER_PORT: 8501
+      STREAMLIT_SERVER_ADDRESS: 0.0.0.0
+      
+      BACKEND_API_URL: ${BACKEND_API_URL:-http://backend:8000}
+    depends_on:
+      - backend
+    volumes:
+      - ./autonomous-agent/frontend:/app
+      - /app/__pycache__
+    networks:
+      - oceanai_network
+    # restart: unless-stopped
+
+networks:
+  oceanai_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+
