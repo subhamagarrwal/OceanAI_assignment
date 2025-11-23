@@ -39,5 +39,5 @@ else:
 
 VECTOR_TABLE = os.getenv("VECTOR_TABLE", "rag_nodes")
 
-# Embeddings
+# Embeddings dimension
 EMBED_DIM = 384
