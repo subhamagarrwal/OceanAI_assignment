@@ -97,9 +97,6 @@ Users can deploy the frontend and backend locally using either:
 - **Manual setup**: Follow the installation steps in the "Run" section above
 
 ### Production Deployment
-For production deployment, users can consider using:
-- **Container orchestration**: Deploy the Docker images to platforms like AWS ECS, Azure Container Instances, or Google Cloud Run
-- **Traditional hosting**: Use platforms like AWS EC2, Heroku, or DigitalOcean to host the backend and frontend services
-- **Managed services**: Leverage managed database services and serverless functions for scalability
-
-The optimized Docker images are production-ready and include all necessary dependencies.
+Have deployed the frontend and the backend seperately for the sake of convenience, alongside using AWS Lambda function and Eventbridge scehduler to avoid the free tiered deployed Render web service from winding down(Render free tiered web service winds down after 15 minutes of activity.)
+-**`Deployed frontend`**: https://oceanai-assignment-yrkg.onrender.com/
+-**`Deployed backend`**:  https://oceanai-backend.onrender.com/  
