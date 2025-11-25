@@ -2,7 +2,6 @@ class ChromaRetriever:
     def __init__(self, collection, k=3):
         """
         Initialize retriever with ChromaDB collection.
-        ChromaDB handles embeddings internally, no external model needed.
         """
         self.collection = collection
         self.k = k
