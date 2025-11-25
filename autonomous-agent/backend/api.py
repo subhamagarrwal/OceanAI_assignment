@@ -49,7 +49,7 @@ async def startup_event():
     try:
         print("1.Initializing RAG Engine...")
         
-        # Initialize vector store (ChromaDB with built-in embeddings)
+        # Initialize vector store -ChromaDB
         print("Connecting to vector store...")
         vector_store = get_vector_store()
         print("2.Vector store connected")
@@ -71,8 +71,8 @@ async def startup_event():
     except Exception as e:
         import traceback
         print(f"Error: Startup error: {e}")
-        print(f"❌ Traceback:\n{traceback.format_exc()}")
-        print("⚠️ Server will start but some features may be unavailable")
+        print(f"Traceback:\n{traceback.format_exc()}")
+        print("Server will start but some features may be unavailable")
         agent = None
         rag_engine = None
         vector_store = None

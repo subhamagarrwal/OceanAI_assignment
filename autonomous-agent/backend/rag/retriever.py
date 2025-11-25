@@ -10,7 +10,7 @@ class ChromaRetriever:
     def retrieve(self, query_bundle):
         from llama_index.core.schema import NodeWithScore, TextNode
         
-        # Use ChromaDB's built-in embeddings - no manual encoding needed
+        # Use ChromaDB's built-in embeddings
         results = self.collection.query(
             query_texts=[query_bundle.query_str],
             n_results=self.k

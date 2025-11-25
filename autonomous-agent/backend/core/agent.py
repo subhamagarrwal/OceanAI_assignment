@@ -23,11 +23,10 @@ class AutonomousQAAgent:
     def generate_selenium_code(self, test_case: dict) -> str:
         print(f"\n Step 2: Generating Selenium code for TC: {test_case.get('id', 'Unknown')}")
         
-        # 1. Retrieve HTML Content
+        #Retrieve HTML Content
         html_content = ""
-        # Try assets folder first
+        # Trying assets folders
         assets_path = Path("assets/checkout.html")
-        # Try temp_uploads folder next (relative to backend execution)
         temp_path = Path("temp_uploads/checkout.html")
         # Try absolute path if needed (assuming workspace root)
         workspace_assets = Path("../assets/checkout.html")
@@ -39,8 +38,8 @@ class AutonomousQAAgent:
         elif workspace_assets.exists():
             html_content = workspace_assets.read_text(encoding="utf-8")
         else:
-            print("⚠️ Warning: checkout.html not found in assets or temp_uploads")
-            html_content = "<!-- HTML Content not found. Please assume standard checkout form elements. -->"
+            print("Warning: checkout.html not found in assets or temp_uploads")
+            html_content = "<!-- HTML Content not found;assume standard checkout form elements. -->"
 
         # 2. Retrieve RAG Context
         # We query the RAG engine using the test case description or steps
@@ -88,7 +87,7 @@ class AutonomousQAAgent:
         plan_file = self.output_dir / f"test_plan_{timestamp}.json"
         with open(plan_file, "w") as f:
             json.dump(test_plan, f, indent=2)
-        print(f"📄 Test plan: {plan_file}")
+        print(f"Test plan: {plan_file}")
         return plan_file
 
     def save_code(self, tc_id: str, code: str) -> Path:
@@ -124,5 +123,4 @@ class AutonomousQAAgent:
         
         summary = self.save_artifacts(test_plan, codes, requirement)
         print("AUTONOMOUS QA AGENT - COMPLETED")
-        print("="*60)
         return {"test_plan": test_plan, "codes": codes, "summary": summary}

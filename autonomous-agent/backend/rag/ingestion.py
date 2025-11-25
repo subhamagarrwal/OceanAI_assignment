@@ -45,6 +45,6 @@ def ingest_documents(file_path: str, collection):
             documents=valid_docs,
             ids=valid_ids
         )
-        print(f"✅ Successfully added {len(valid_docs)} documents to ChromaDB.")
+        print(f"Successfully added {len(valid_docs)} documents to ChromaDB.")
     else:
         print("No valid content found to ingest.")

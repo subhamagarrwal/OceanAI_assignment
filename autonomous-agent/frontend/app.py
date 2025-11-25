@@ -14,7 +14,7 @@ from views.coding import render_coding_view
 # --- Page Config ---
 st.set_page_config(
     page_title="Autonomous QA Agent",
-    page_icon="🤖",
+    page_icon="",
     layout="centered"
 )
 
@@ -25,8 +25,8 @@ initialize_session_state()
 render_sidebar()
 
 # --- Main Content ---
-st.title("🤖 Autonomous QA Agent")
-st.markdown("Build a testing brain from your project documentation.")
+st.title("Autonomous QA Agent-OceanAI assignment")
+st.markdown("Build a knowledge base for your content.html and generating Selenium code.")
 
 # --- Views ---
 render_ingestion_view()

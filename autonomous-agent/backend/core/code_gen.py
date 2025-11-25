@@ -125,10 +125,10 @@ Generate a Selenium Python script for this test case.
         is_valid, error_msg = validate_python_code(clean_content)
         
         if is_valid:
-            print("✅ Code validation passed!")
+            print("Code validation passed!")
             return clean_content
         else:
-            print(f"❌ Validation failed: {error_msg}")
+            print(f"Validation failed: {error_msg}")
             if attempt < max_retries - 1:
                 prompt_base = f"""
 The previous code had a syntax error:

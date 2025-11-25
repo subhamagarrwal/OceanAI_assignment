@@ -4,7 +4,6 @@ from utils.api_client import APIClient
 def render_coding_view():
     """Renders the Phase 3: Selenium Script Generation view."""
     if st.session_state.step >= 3:
-        st.markdown("---")
         st.subheader("3. Selenium Script Generator")
         
         test_plan = st.session_state.test_plan
@@ -14,7 +13,7 @@ def render_coding_view():
             st.error("No test cases found in the plan.")
         else:
             # Display Test Plan Summary
-            with st.expander("📄 View Generated Test Plan", expanded=False):
+            with st.expander("View Generated Test Plan", expanded=False):
                 st.json(test_plan)
                 
             # Selection
@@ -27,17 +26,16 @@ def render_coding_view():
             if st.button("Generate Selenium Script", type="primary"):
                 with st.spinner(f"Writing Python code for {tc_id}..."):
                     
-                    # Check if we already generated it
+                    # Check if already generated
                     if tc_id in st.session_state.generated_code:
                         code = st.session_state.generated_code[tc_id]
-                    else:
-                        # Call API
+                    else:# Call api
                         code = APIClient.generate_code(selected_tc)
                         st.session_state.generated_code[tc_id] = code
                     
                     st.success(f"Script generated for {tc_id}!")
             
-            # Display Code if available
+            # Display code 
             if tc_id in st.session_state.generated_code:
-                st.markdown(f"### 🐍 Generated Code: {tc_id}")
+                st.markdown(f"Generated Code: {tc_id}")
                 st.code(st.session_state.generated_code[tc_id], language="python")

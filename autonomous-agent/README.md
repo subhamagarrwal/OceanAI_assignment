@@ -3,14 +3,36 @@
 ## Run
 
 ### Prerequisites
-The project requires API keys and Database credentials. I have provided a `.env.example` file with the necessary credentials for this assignment.
+The project requires API key for Groq. I have provided a `.env.example` file with the necessary credentials for this assignment.
 
 ```bash
 # Rename the example file to .env in root 
 cp .env.example .env
 ```
 
-### Backend
+### Option 1: Docker (Recommended)
+The easiest way to run the entire application stack (backend + frontend) is using Docker Compose:
+
+1. Ensure Docker and Docker Compose are installed on your system.Open Docker on your system to ensure Docker Engine is running.
+2. From the project root directory, run:
+   ```bash
+   docker-compose up --build
+   ```
+3. Access the application:
+   - **Frontend (Streamlit)**: `http://localhost:8501`
+   - **Backend (FastAPI)**: `http://localhost:8000`
+   - **API Documentation**: `http://localhost:8000/docs`
+
+4. To stop the services:
+   ```bash
+   docker-compose down
+   ```
+
+The backend Docker image has been optimized from 8.24GB to 971MB  by removing the redundant `sentence-transformers` dependency (because having that meant docker would also install heavier transitory dependencies) and using ChromaDB's built-in embeddings.
+
+### Option 2: Manual Setup
+
+#### Backend
 1. Go to `backend` directory:
    ```bash
    cd backend
@@ -26,7 +48,7 @@ cp .env.example .env
    ```
 4. Access at `http://localhost:8000/`.
 
-### Frontend 
+#### Frontend 
 1. Navigate to the `frontend` directory:
    ```bash
    cd frontend
@@ -69,4 +91,15 @@ Provides the user interface for interacting with the agent.
 
 ## Deployment 
 
-Users can deploy the frontend and backend locally after filling in the relevant details for the .env file. For production deployment, users can consider using platforms like AWS or Heroku to host the backend and frontend services.
+### Local Development
+Users can deploy the frontend and backend locally using either:
+- **Docker Compose** (recommended): Run `docker-compose up --build` from the project root
+- **Manual setup**: Follow the installation steps in the "Run" section above
+
+### Production Deployment
+For production deployment, users can consider using:
+- **Container orchestration**: Deploy the Docker images to platforms like AWS ECS, Azure Container Instances, or Google Cloud Run
+- **Traditional hosting**: Use platforms like AWS EC2, Heroku, or DigitalOcean to host the backend and frontend services
+- **Managed services**: Leverage managed database services and serverless functions for scalability
+
+The optimized Docker images are production-ready and include all necessary dependencies.
